@@ -1,24 +1,16 @@
-# Proyecto-BD-GRAN-ESCALA
+# Proyecto Global Mart Consolidation Pipeline
 
-# Global Mart Consolidation Pipeline
-
-Proyecto desarrollado para el Workshop de Data Engineering 2026.
-
-La solución implementa un pipeline ETL utilizando Apache Beam,
-Parquet, PostgreSQL, dbt y Apache Airflow para construir una
-arquitectura analítica basada en capas Silver y Gold.
+Arquitectura ETL desarrollada con **Apache Beam, dbt, PostgreSQL y Airflow**, orientada a la construcción de una arquitectura tipo **Bronze–Silver–Gold** para el procesamiento analítico de datos de ventas.
 
 ---
 
 # Estructura del proyecto
 
 ```text
-PROYECTO/
-
+proyecto/
+│
 ├── airflow/
 │   └── global_mart_consolidation_pipeline.py
-│
-├── airflow_home/
 │
 ├── beam/
 │   └── pipeline.py
@@ -28,7 +20,6 @@ PROYECTO/
 │   ├── status_logs.csv
 │   ├── silver/
 │   │   └── sales_silver.parquet
-│   │
 │   └── rejected/
 │
 ├── dbt_project/
@@ -36,92 +27,87 @@ PROYECTO/
 │   │   ├── staging/
 │   │   ├── intermediate/
 │   │   └── marts/
-│   │
 │   ├── tests/
 │   ├── seeds/
-│   ├── target/
-│   ├── logs/
-│   ├── dbt_packages/
 │   ├── dbt_project.yml
-│   ├── profiles.yml
-│   └── .user.yml
+│   └── profiles.yml
 │
 ├── postgres/
 │
-├── load_silver_to_postgres.py
+├── check_parquet.py
 │
-└── check_parquet.py
+└── README.md
 ```
 
 ---
 
 # Configuración del entorno
 
-Crear entorno virtual
+El proyecto fue desarrollado utilizando **WSL2 (Ubuntu)** debido a las dependencias requeridas por Apache Airflow, las cuales presentan incompatibilidades con Windows.
 
-```bash
-python -m venv venv
-```
-
-Activar entorno
-
-Linux / WSL
-
-```bash
-source venv/bin/activate
-```
-
-Windows
-
-```bash
-venv\Scripts\activate
-```
-
-Instalar dependencias
+## Instalación de dependencias
 
 ```bash
 pip install -r requirements.txt
+```
+
+o alternativamente:
+
+```bash
+pip install apache-beam
+pip install pyarrow
+pip install pandas
+pip install psycopg2
+pip install sqlalchemy
+pip install dbt-postgres
+pip install apache-airflow
 ```
 
 ---
 
 # Variables de entorno
 
-Configurar PostgreSQL:
+Para Airflow:
 
 ```bash
+export AIRFLOW_HOME=~/airflow
+```
+
+Para PostgreSQL:
+
+```text
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
 POSTGRES_DB=global_mart
 POSTGRES_USER=postgres
-POSTGRES_PASSWORD=password
-```
-
-Configurar Airflow:
-
-```bash
-AIRFLOW_HOME=~/airflow
+POSTGRES_PASSWORD=*****
 ```
 
 ---
 
 # Ejecución del pipeline
 
-## 1. Ejecutar Apache Beam
+## Apache Beam
 
 ```bash
 python beam/pipeline.py
 ```
 
-Salida generada
+Genera:
 
 ```text
 data/silver/sales_silver.parquet
 ```
 
+y
+
+```text
+data/rejected/rejected_sales.csv
+```
+
 ---
 
-## 2. Verificar Parquet
+## Verificación del archivo Parquet
 
 ```bash
 python check_parquet.py
@@ -129,129 +115,73 @@ python check_parquet.py
 
 ---
 
-## 3. Cargar Silver en PostgreSQL
+## Carga de Silver hacia PostgreSQL
 
 ```bash
-python load_silver_to_postgres.py
-```
-
-Tabla generada
-
-```text
-raw_sales_silver
+python dbt_project/load_silver_to_postgres.py
 ```
 
 ---
 
-## 4. Ejecutar dbt
-
-Instalar dependencias
+## Ejecución de dbt
 
 ```bash
-dbt deps
-```
+cd dbt_project
 
-Ejecutar modelos
-
-```bash
+dbt seed
 dbt run
-```
-
-Validar modelos
-
-```bash
 dbt test
 ```
 
 ---
 
-## 5. Ejecutar Airflow
+## Ejecución de Airflow
 
-Inicializar base de datos
-
-```bash
-airflow db init
-```
-
-Ejecutar scheduler
+Iniciar scheduler:
 
 ```bash
 airflow scheduler
 ```
 
-Ejecutar servidor web
+En otra terminal:
 
 ```bash
 airflow webserver
 ```
 
----
-
-# DAG implementado
+La interfaz estará disponible en:
 
 ```text
-extract_and_transform_silver
-
-↓
-
-sensor_silver_data
-
-↓
-
-load_silver_to_postgres
-
-↓
-
-load_and_model_gold
-```
-
-Archivo:
-
-```text
-airflow/global_mart_consolidation_pipeline.py
+http://localhost:8080
 ```
 
 ---
 
-# Modelos dbt
-
-La capa analítica está organizada en tres niveles:
-
-```text
-staging/
-intermediate/
-marts/
-```
-
-permitiendo separar:
-
-- limpieza de datos;
-- transformaciones intermedias;
-- indicadores finales;
-- tablas de negocio.
-
----
-
-# Dependencias principales
+# Tecnologías utilizadas
 
 - Apache Beam
 - PyArrow
-- pandas
-- PostgreSQL
-- SQLAlchemy
-- psycopg2
 - dbt
+- PostgreSQL
 - Apache Airflow
+- Pandas
+- SQLAlchemy
+- WSL2
 
 ---
 
-# Limitaciones conocidas
+# Observaciones
 
-La ejecución simultánea de PostgreSQL sobre Windows y Airflow en WSL
-puede requerir configuraciones adicionales de conectividad.
+Durante el desarrollo se identificaron limitaciones asociadas a la interoperabilidad entre WSL2 y PostgreSQL ejecutado en Windows, lo que afectó la persistencia automática de la capa Gold y la generación de KPIs mediante dbt.
 
-En futuros desarrollos se propone incorporar Docker para simplificar
-el despliegue y la integración entre servicios.
+No obstante, se implementó satisfactoriamente:
+
+- Procesamiento ETL con Apache Beam
+- Manejo de errores mediante Side Outputs
+- Generación de archivos Parquet
+- Modelado analítico con dbt
+- Definición del DAG de Airflow
+- Arquitectura Silver–Gold propuesta en el diseño
 
 ---
 
