@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: fct_sales_daily
+    columns:
+      - name: store_id
+        tests:
+          - not_null
+
+      - name: total_sales_usd
+        tests:
+          - not_null

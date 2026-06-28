@@ -1,0 +1,12 @@
+super_market_dbt:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: 10.255.255.254
+      user: postgres
+      password: javi1234
+      port: 5432
+      dbname: supermarket
+      schema: public
+      threads: 4

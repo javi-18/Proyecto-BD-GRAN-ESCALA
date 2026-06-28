@@ -1,0 +1,28 @@
+# Airflow
+airflow_home/
+
+# Beam temporales
+data/rejected/beam-temp*
+
+# dbt
+dbt_project/logs/
+dbt_project/target/
+dbt_project/dbt_packages/
+
+
+# Python
+__pycache__/
+*.pyc
+
+# VSCode
+.vscode/
+
+# Variables sensibles
+.env
+
+# Archivos generados
+*.log
+
+# Sistema
+.DS_Store
+Thumbs.db

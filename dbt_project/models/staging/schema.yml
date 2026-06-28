@@ -1,0 +1,17 @@
+vversion: 2
+
+models:
+  - name: stg_sales
+    columns:
+      - name: transaction_id
+        tests:
+          - not_null
+          - unique
+
+      - name: sku
+        tests:
+          - not_null
+
+      - name: raw_amount
+        tests:
+          - not_null

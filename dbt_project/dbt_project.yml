@@ -1,0 +1,28 @@
+name: 'super_market_dbt'
+version: '1.0.0'
+
+config-version: 2
+
+profile: 'super_market_dbt'
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+
+models:
+  super_market_dbt:
+    staging:
+      +materialized: view
+
+    intermediate:
+      +materialized: view
+
+    marts:
+      +materialized: table
+
+
+seeds:
+
+  super_market_dbt:
+
+    +schema: public

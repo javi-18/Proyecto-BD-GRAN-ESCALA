@@ -1,0 +1,7 @@
+source,reason,raw_record
+status_logs,estado_invalido,"transaction_id,status_name,status_date"
+status_logs,estado_invalido,"TX-010,BAD_STATUS,2026-06-20T19:30:00Z"
+sales_data,amount_menor_o_igual_a_cero,"TX-004,ST-CHI-02,PROD-300,-5000,CLP"
+sales_data,amount_menor_o_igual_a_cero,"TX-005,ST-PER-02,PROD-100,0,PEN"
+sales_data,campo_critico_nulo,"TX-006,ST-ARG-01,,4500,ARS"
+sales_data,amount_no_numerico,"TX-008,ST-CHI-01,PROD-400,INVALID_AMT,CLP"
